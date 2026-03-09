@@ -1,0 +1,5 @@
+{
+  "name": "My Personal Assistant Bot",
+  "description": "A chatbot that strictly remembers what you tell it and answers questions based only on its memory using DeepSeek API.",
+  "requestFramePermissions": []
+}

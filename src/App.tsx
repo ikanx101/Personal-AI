@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Settings, Send, Trash2, X, AlertTriangle, MessageSquare, BrainCircuit } from 'lucide-react';
-import { loadState, saveState, AppState, Message } from './lib/storage';
+import { loadState, saveState, AppState, Message, Memory } from './lib/storage';
 import { callDeepSeek } from './lib/api';
 
 export default function App() {
@@ -54,9 +54,16 @@ export default function App() {
         timestamp: Date.now()
       };
 
+      const newMemories: Memory[] = (result.new_memories || []).map((m, i) => ({
+        id: (Date.now() + i).toString(),
+        content: m.content,
+        createdAt: new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }),
+        targetDate: m.targetDate || undefined
+      }));
+
       setState(prev => ({
         ...prev,
-        memories: [...prev.memories, ...(result.new_memories || [])],
+        memories: [...prev.memories, ...newMemories],
         messages: [...prev.messages, assistantMsg]
       }));
     } catch (error: any) {
@@ -201,9 +208,15 @@ export default function App() {
                   {state.memories.length === 0 ? (
                     <p className="text-center italic text-gray-400">Belum ada memori.</p>
                   ) : (
-                    <ul className="list-disc pl-4 space-y-1">
-                      {state.memories.map((mem, i) => (
-                        <li key={i}>{mem}</li>
+                    <ul className="list-disc pl-4 space-y-2">
+                      {state.memories.map((mem) => (
+                        <li key={mem.id} className="flex flex-col">
+                          <span className="text-gray-700">{mem.content}</span>
+                          <span className="text-xs text-gray-400 mt-0.5">
+                            Dibuat: {mem.createdAt}
+                            {mem.targetDate && ` • Target: ${mem.targetDate}`}
+                          </span>
+                        </li>
                       ))}
                     </ul>
                   )}
